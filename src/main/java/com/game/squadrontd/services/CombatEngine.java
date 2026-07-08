@@ -18,53 +18,62 @@ public class CombatEngine {
      * Altere el estado del juego (vida de la base y recompensas) basado en el resultado.
      */
     public String resolveWave(Game game, WaveInfo wave) {
-        // 1. Calcular el poder total de nuestras defensas
-        int totalDefenseHp = game.getDefenses().stream().mapToInt(d -> d.getType().getHp()).sum();
-        int totalDefenseAttack = game.getDefenses().stream().mapToInt(d -> d.getType().getAttack()).sum();
+        int baseDefenseHp = game.getDefenses().stream().mapToInt(d -> d.getType().getHp()).sum();
+        int baseDefenseAttack = game.getDefenses().stream().mapToInt(d -> d.getType().getAttack()).sum();
 
-        // 2. Calcular el poder total de la oleada
-        int totalEnemyHp = wave.getEnemyCount() * wave.getEnemyHp();
-        int totalEnemyAttack = wave.getEnemyCount() * wave.getEnemyAttack();
+        int baseEnemyHp = wave.getEnemyCount() * wave.getEnemyHp();
+        int baseEnemyAttack = wave.getEnemyCount() * wave.getEnemyAttack();
+
+        int currentDefenseHp = baseDefenseHp;
+        int currentEnemyHp = baseEnemyHp;
 
         StringBuilder log = new StringBuilder();
         log.append("--- INICIO DE OLEADA ").append(wave.getWaveNumber()).append(" ---\n");
-        log.append("Defensas (Poder: ").append(totalDefenseAttack).append(", Vida: ").append(totalDefenseHp).append(")\n");
+        log.append("Defensas (Poder: ").append(baseDefenseAttack).append(", Vida: ").append(baseDefenseHp).append(")\n");
         log.append("Enemigos: ").append(wave.getEnemyCount()).append("x ").append(wave.getEnemyName())
-           .append(" (Poder: ").append(totalEnemyAttack).append(", Vida: ").append(totalEnemyHp).append(")\n");
+           .append(" (Poder: ").append(baseEnemyAttack).append(", Vida: ").append(baseEnemyHp).append(")\n");
 
-        // Regla súper simplificada: 
-        // Si nuestro ataque es mayor a la vida del enemigo, mueren sin tocarnos.
-        // Si no, sufriremos algo de daño que absorberán nuestras defensas. Si nuestras defensas mueren, sufrimos en la base.
-        
-        // Fase 1: Defensas atacan primero (ventaja defensora)
-        int remainingEnemyHp = totalEnemyHp - totalDefenseAttack;
-        
-        if (remainingEnemyHp <= 0) {
-            log.append("¡Tus defensas han aniquilado la oleada sin recibir un rasguño!\n");
-            // Dar oro de recompensa completo
+        if (baseDefenseAttack == 0) {
+            log.append("No tienes defensas. Los enemigos avanzan directamente hacia la base.\n");
+            currentDefenseHp = 0;
+        }
+
+        int round = 1;
+        while (currentDefenseHp > 0 && currentEnemyHp > 0) {
+            // Calcular daño actual basado en porcentaje de vida (para que a menos vida, menos peguen)
+            int currentDefenseAttack = (int) Math.ceil(baseDefenseAttack * ((double) currentDefenseHp / baseDefenseHp));
+            
+            // Defensas atacan primero
+            currentEnemyHp -= currentDefenseAttack;
+            log.append("Ronda ").append(round).append(": Defensas hacen ").append(currentDefenseAttack).append(" daño. ");
+            
+            if (currentEnemyHp <= 0) {
+                log.append("Enemigos aniquilados.\n");
+                break;
+            }
+            
+            // Enemigos supervivientes atacan
+            int currentEnemyAttack = (int) Math.ceil(baseEnemyAttack * ((double) currentEnemyHp / baseEnemyHp));
+            currentDefenseHp -= currentEnemyAttack;
+            log.append("Enemigos responden con ").append(currentEnemyAttack).append(" daño.\n");
+            
+            round++;
+        }
+
+        if (currentEnemyHp <= 0) {
+            log.append("¡Tus defensas han defendido la base con éxito!\n");
             int reward = wave.getEnemyCount() * wave.getGoldRewardPerEnemy();
             game.setGold(game.getGold() + reward);
             log.append("Recompensa: +").append(reward).append(" oro.\n");
         } else {
-            // Fase 2: Los enemigos sobrevivientes atacan
-            // (El daño del enemigo es proporcional a la vida que les quedó)
-            double survivalRatio = (double) remainingEnemyHp / totalEnemyHp;
-            int actualEnemyDamage = (int) (totalEnemyAttack * survivalRatio);
+            // Las defensas murieron, el daño de los enemigos restantes va a la base
+            double survivalRatio = (double) currentEnemyHp / baseEnemyHp;
+            int remainingDamage = (int) Math.ceil(baseEnemyAttack * survivalRatio);
             
-            log.append("Sobrevivieron algunos enemigos. Te atacan con poder de: ").append(actualEnemyDamage).append("\n");
-            
-            int remainingDefenseHp = totalDefenseHp - actualEnemyDamage;
-            
-            if (remainingDefenseHp >= 0) {
-                log.append("Tus defensas aguantaron el golpe. ¡Sobrevives a la oleada!\n");
-            } else {
-                // Las defensas cayeron, el daño remanente va a la base
-                int damageToBase = Math.abs(remainingDefenseHp);
-                game.setBaseHealth(Math.max(0, game.getBaseHealth() - damageToBase));
-                log.append("¡Tus defensas fueron destruidas! Tu base ha recibido ").append(damageToBase).append(" de daño.\n");
-            }
+            game.setBaseHealth(Math.max(0, game.getBaseHealth() - remainingDamage));
+            log.append("¡Tus defensas fueron destruidas! Tu base sufre ").append(remainingDamage).append(" de daño.\n");
 
-            // Damos recompensa parcial basada en daño hecho
+            // Recompensa parcial
             int killedEnemies = (int)((1.0 - survivalRatio) * wave.getEnemyCount());
             int reward = killedEnemies * wave.getGoldRewardPerEnemy();
             game.setGold(game.getGold() + reward);

@@ -77,6 +77,13 @@ body {
     flex-direction: column;
 }
 
+#game-ui {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
 /* Start Overlay */
 .overlay {
     position: absolute;
@@ -151,11 +158,20 @@ body {
     min-height: 0;
 }
 
-.shop-panel, .battlefield-panel, .log-panel {
+.shop-panel, .battlefield-panel {
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    min-height: 0;
+}
+
+.log-panel {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
 }
 
 h2 {
