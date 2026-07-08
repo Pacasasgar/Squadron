@@ -45,9 +45,8 @@ public class GameController {
         return gameService.investEconomy(id);
     }
 
-    // POST /api/games/{id}/start-wave -> Empieza la oleada y devuelve el log de batalla
     @PostMapping("/{id}/start-wave")
-    public String startWave(@PathVariable Long id) {
+    public com.game.squadrontd.models.BattleReplay startWave(@PathVariable Long id) {
         return gameService.startWave(id);
     }
 }

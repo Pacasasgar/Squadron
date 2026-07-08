@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <!-- Main Styles -->
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     <!-- Background Elements -->
@@ -75,10 +75,20 @@
                     <div class="shop-item">
                         <div class="item-info">
                             <h3>Knight</h3>
-                            <p>HP: 150 | ATK: 35</p>
+                            <p>HP: 150 | ATK: 35 | Físico / Pesada</p>
                         </div>
                         <button class="btn-buy" onclick="buyDefense('KNIGHT')">
                             50 <span class="gold-icon">💰</span>
+                        </button>
+                    </div>
+
+                    <div class="shop-item">
+                        <div class="item-info">
+                            <h3>Mage</h3>
+                            <p>HP: 40 | ATK: 30 | Mágico / Ligera</p>
+                        </div>
+                        <button class="btn-buy" onclick="buyDefense('MAGE')">
+                            40 <span class="gold-icon">💰</span>
                         </button>
                     </div>
 
@@ -101,9 +111,19 @@
 
                 <!-- Center Panel: Battlefield Info -->
                 <main class="glass-panel battlefield-panel">
-                    <h2>Current Defenses</h2>
-                    <div id="defenses-container" class="defenses-grid">
-                        <!-- Defenses will be injected here -->
+                    <div id="battle-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
+                        <h2 style="border: none; margin: 0; padding: 0;">Aliados</h2>
+                        <h2 id="enemies-title" class="hidden" style="border: none; margin: 0; padding: 0; color: var(--danger);">Enemigos</h2>
+                    </div>
+                    
+                    <div class="battle-arena">
+                        <div id="defenses-container" class="defenses-grid">
+                            <!-- Defenses will be injected here -->
+                        </div>
+                        
+                        <div id="enemies-container" class="enemies-grid hidden">
+                            <!-- Enemies will be injected here during battle -->
+                        </div>
                     </div>
                 </main>
 
@@ -120,6 +140,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="app.js"></script>
+    <script src="app.js?v=3"></script>
 </body>
 </html>

@@ -11,5 +11,7 @@ public class WaveInfo {
     private int enemyCount;
     private int enemyHp;
     private int enemyAttack;
+    private DamageType enemyDamageType;
+    private ArmorType enemyArmorType;
     private int goldRewardPerEnemy;
 }

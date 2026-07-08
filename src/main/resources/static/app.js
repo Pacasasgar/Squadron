@@ -71,13 +71,18 @@ async function investEconomy() {
 async function startWave() {
     if (!currentGameId) return;
     try {
+        // Disable shop
+        document.querySelector('.shop-panel').classList.add('hidden');
+        document.getElementById('enemies-title').classList.remove('hidden');
+        document.getElementById('enemies-container').classList.remove('hidden');
+
         const response = await fetch(`${API_BASE}/${currentGameId}/start-wave`, { method: 'POST' });
         if (!response.ok) throw new Error("Error resolviendo la oleada.");
         
-        const logText = await response.text();
+        const replay = await response.json();
         
-        // Formatear el log para que quede bonito
-        const formattedLog = logText
+        // Print the text log immediately (so user can read while watching)
+        const formattedLog = replay.textLog
             .replace(/--- INICIO DE OLEADA (.*) ---/g, '<span class="wave">--- INICIO DE OLEADA $1 ---</span>')
             .replace(/Recompensa(.*?)\+/g, '<span class="reward">Recompensa$1+</span>')
             .replace(/daño/gi, '<span class="damage">daño</span>')
@@ -86,13 +91,86 @@ async function startWave() {
             .filter(line => line.trim().length > 0)
             .map(line => `> ${line}`)
             .join('<br>');
-            
         appendLog(formattedLog);
+
+        await playReplay(replay);
         
-        // Update game state
+        // Restore UI after replay
+        document.querySelector('.shop-panel').classList.remove('hidden');
+        document.getElementById('enemies-title').classList.add('hidden');
+        document.getElementById('enemies-container').classList.add('hidden');
+        
         refreshGameState();
     } catch (error) {
         appendLog(`> <span class="damage">[ERROR]</span> ${error.message}`);
+        document.querySelector('.shop-panel').classList.remove('hidden');
+    }
+}
+
+async function playReplay(replay) {
+    // 1. Render initial state
+    renderUnits('defenses-container', replay.initialDefenses, 'ally');
+    renderUnits('enemies-container', replay.initialEnemies, 'enemy');
+
+    // 2. Play rounds
+    for (let round of replay.rounds) {
+        await new Promise(r => setTimeout(r, 800)); // 0.8s per round
+
+        // Update ally HPs
+        for (let i = 0; i < round.defenseHps.length; i++) {
+            const unit = replay.initialDefenses[i];
+            const hp = round.defenseHps[i];
+            updateHpBar(unit.id, hp, unit.maxHp);
+        }
+
+        // Update enemy HPs
+        for (let i = 0; i < round.enemyHps.length; i++) {
+            const unit = replay.initialEnemies[i];
+            const hp = round.enemyHps[i];
+            updateHpBar(unit.id, hp, unit.maxHp);
+        }
+    }
+    await new Promise(r => setTimeout(r, 800)); // Pause at the end
+}
+
+function renderUnits(containerId, units, side) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    const iconMap = { 'INFANTRY': '🛡️', 'ARCHER': '🏹', 'KNIGHT': '⚔️', 'MAGE': '🔮' };
+
+    units.forEach(u => {
+        const div = document.createElement('div');
+        div.className = 'defense-card';
+        div.id = `card-${u.id}`;
+        
+        const typeHtml = side === 'ally' ? 
+            `<div class="type">${u.name}</div>` : 
+            `<div class="type" style="color: var(--danger)">${u.name}</div>`;
+            
+        div.innerHTML = `
+            <div class="icon">${iconMap[u.name] || '👾'}</div>
+            ${typeHtml}
+            <div style="font-size: 0.7rem; color: var(--text-muted)">${u.damageType} | ${u.armorType}</div>
+            <div class="hp-bar-container">
+                <div id="hp-${u.id}" class="hp-bar ${side}" style="width: 100%"></div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function updateHpBar(unitId, currentHp, maxHp) {
+    const bar = document.getElementById(`hp-${unitId}`);
+    const card = document.getElementById(`card-${unitId}`);
+    if (bar) {
+        const pct = Math.max(0, (currentHp / maxHp) * 100);
+        bar.style.width = `${pct}%`;
+        
+        if (pct === 0 && card) {
+            card.style.opacity = '0.3';
+            card.style.filter = 'grayscale(100%)';
+        }
     }
 }
 

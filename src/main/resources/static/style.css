@@ -275,11 +275,36 @@ button {
 .mt-auto { margin-top: auto; }
 
 /* Battlefield Grid */
-.defenses-grid {
+.battle-arena {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    height: 100%;
 }
+
+.defenses-grid, .enemies-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow-y: auto;
+}
+
+.hp-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.hp-bar {
+    height: 100%;
+    transition: width 0.3s ease-out;
+}
+
+.hp-bar.ally { background: var(--green); }
+.hp-bar.enemy { background: var(--danger); }
 
 .defense-card {
     background: rgba(0, 0, 0, 0.4);
