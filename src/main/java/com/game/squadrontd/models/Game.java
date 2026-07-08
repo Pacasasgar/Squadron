@@ -23,7 +23,7 @@ public class Game {
     private int currentWave = 1;
     
     // Player State simplified within Game
-    private int gold = 50;
+    private int gold = 100;
     private int income = 10;
     private int baseHealth = 100;
 

@@ -57,6 +57,10 @@ public class GameService {
         Game game = getGame(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Partida no encontrada"));
 
+        if (game.getStatus() == GameStatus.GAME_OVER || game.getStatus() == GameStatus.VICTORY) {
+            throw new IllegalStateException("La partida ya ha terminado");
+        }
+
         int cost = 50; // Costo fijo por ahora para mejorar income
         if (game.getGold() >= cost) {
             game.setGold(game.getGold() - cost);
@@ -71,6 +75,10 @@ public class GameService {
     public String startWave(Long gameId) {
         Game game = getGame(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Partida no encontrada"));
+
+        if (game.getStatus() == GameStatus.GAME_OVER || game.getStatus() == GameStatus.VICTORY) {
+            throw new IllegalStateException("La partida ya ha terminado");
+        }
 
         // Definimos la oleada (idealmente vendría de una base de datos o configuración YAML)
         WaveInfo currentWave = getWaveConfig(game.getCurrentWave());

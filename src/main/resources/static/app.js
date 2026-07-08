@@ -103,12 +103,23 @@ async function refreshGameState() {
     updateHUD(game);
     
     if (game.status === 'GAME_OVER') {
-        appendLog(`> <span class="damage">Has perdido la partida. Refresca la página para volver a intentar.</span>`);
-        document.getElementById('btn-start-wave').disabled = true;
+        if (!document.getElementById('btn-start-wave').disabled) {
+            appendLog(`> <span class="damage">Has perdido la partida. Refresca la página para volver a intentar.</span>`);
+            disableUI();
+        }
     } else if (game.status === 'VICTORY') {
-        appendLog(`> <span class="reward">¡HAS GANADO! ¡Sobreviviste a todas las oleadas!</span>`);
-        document.getElementById('btn-start-wave').disabled = true;
+        if (!document.getElementById('btn-start-wave').disabled) {
+            appendLog(`> <span class="reward">¡HAS GANADO! ¡Sobreviviste a todas las oleadas!</span>`);
+            disableUI();
+        }
     }
+}
+
+function disableUI() {
+    document.getElementById('btn-start-wave').disabled = true;
+    document.querySelectorAll('.btn-buy').forEach(btn => btn.disabled = true);
+    document.querySelectorAll('.btn-buy').forEach(btn => btn.style.opacity = '0.5');
+    document.getElementById('btn-start-wave').style.opacity = '0.5';
 }
 
 function updateHUD(game) {

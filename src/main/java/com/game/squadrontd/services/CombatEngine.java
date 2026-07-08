@@ -60,7 +60,7 @@ public class CombatEngine {
             } else {
                 // Las defensas cayeron, el daño remanente va a la base
                 int damageToBase = Math.abs(remainingDefenseHp);
-                game.setBaseHealth(game.getBaseHealth() - damageToBase);
+                game.setBaseHealth(Math.max(0, game.getBaseHealth() - damageToBase));
                 log.append("¡Tus defensas fueron destruidas! Tu base ha recibido ").append(damageToBase).append(" de daño.\n");
             }
 
