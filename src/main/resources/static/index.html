@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squadron TD - Web Game</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-gradient-1"></div>
+    <div class="bg-gradient-2"></div>
+
+    <div class="app-container" id="app">
+        <!-- Start Game Overlay -->
+        <div id="start-overlay" class="glass-panel overlay">
+            <h1 class="title">SQUADRON <span>TD</span></h1>
+            <p class="subtitle">Defend your base. Build your economy.</p>
+            <button id="btn-new-game" class="btn-primary glow-effect">NUEVA PARTIDA</button>
+        </div>
+
+        <!-- Main Game HUD (Hidden initially) -->
+        <div id="game-ui" class="hidden">
+            
+            <!-- Top HUD -->
+            <header class="glass-panel hud-top">
+                <div class="hud-stat">
+                    <span class="label">WAVE</span>
+                    <span class="value text-gradient" id="val-wave">1</span>
+                </div>
+                <div class="hud-stat">
+                    <span class="label">BASE HEALTH</span>
+                    <span class="value" id="val-health">100</span>
+                </div>
+                <div class="hud-stat">
+                    <span class="label">GOLD</span>
+                    <span class="value text-gold" id="val-gold">50</span>
+                </div>
+                <div class="hud-stat">
+                    <span class="label">INCOME</span>
+                    <span class="value text-green" id="val-income">+10</span>
+                </div>
+            </header>
+
+            <div class="main-layout">
+                <!-- Left Panel: Shop / Actions -->
+                <aside class="glass-panel shop-panel">
+                    <h2>Armory & Economy</h2>
+                    
+                    <div class="shop-item">
+                        <div class="item-info">
+                            <h3>Infantry</h3>
+                            <p>HP: 50 | ATK: 10</p>
+                        </div>
+                        <button class="btn-buy" onclick="buyDefense('INFANTRY')">
+                            20 <span class="gold-icon">💰</span>
+                        </button>
+                    </div>
+
+                    <div class="shop-item">
+                        <div class="item-info">
+                            <h3>Archer</h3>
+                            <p>HP: 20 | ATK: 25</p>
+                        </div>
+                        <button class="btn-buy" onclick="buyDefense('ARCHER')">
+                            25 <span class="gold-icon">💰</span>
+                        </button>
+                    </div>
+
+                    <div class="shop-item">
+                        <div class="item-info">
+                            <h3>Knight</h3>
+                            <p>HP: 150 | ATK: 35</p>
+                        </div>
+                        <button class="btn-buy" onclick="buyDefense('KNIGHT')">
+                            50 <span class="gold-icon">💰</span>
+                        </button>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="shop-item economy-item">
+                        <div class="item-info">
+                            <h3>Invest Economy</h3>
+                            <p>+5 Income per round</p>
+                        </div>
+                        <button class="btn-buy btn-invest" onclick="investEconomy()">
+                            50 <span class="gold-icon">💰</span>
+                        </button>
+                    </div>
+
+                    <button id="btn-start-wave" class="btn-primary w-full mt-auto" onclick="startWave()">
+                        START WAVE
+                    </button>
+                </aside>
+
+                <!-- Center Panel: Battlefield Info -->
+                <main class="glass-panel battlefield-panel">
+                    <h2>Current Defenses</h2>
+                    <div id="defenses-container" class="defenses-grid">
+                        <!-- Defenses will be injected here -->
+                    </div>
+                </main>
+
+                <!-- Right Panel: Combat Log -->
+                <aside class="glass-panel log-panel">
+                    <h2>Combat Log</h2>
+                    <div id="combat-log" class="terminal-view">
+                        <p>> Welcome Commander.</p>
+                        <p>> Prepare your defenses.</p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
