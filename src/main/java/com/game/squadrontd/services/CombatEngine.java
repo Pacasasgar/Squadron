@@ -5,6 +5,9 @@ import com.game.squadrontd.models.Game;
 import com.game.squadrontd.models.WaveInfo;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * CombatEngine: Lógica pura de cálculo (Algoritmo de Batalla).
  * Extraemos esto fuera del GameService para mantener la "Single Responsibility".
@@ -13,73 +16,109 @@ import org.springframework.stereotype.Service;
 @Service
 public class CombatEngine {
 
-    /**
-     * Resuelve el combate y devuelve un resumen de texto de lo ocurrido.
-     * Altere el estado del juego (vida de la base y recompensas) basado en el resultado.
-     */
+    // Clase interna temporal para simular combate táctico
+    private static class CombatUnit {
+        String name;
+        int hp;
+        int attack;
+
+        CombatUnit(String name, int hp, int attack) {
+            this.name = name;
+            this.hp = hp;
+            this.attack = attack;
+        }
+    }
+
     public String resolveWave(Game game, WaveInfo wave) {
-        int baseDefenseHp = game.getDefenses().stream().mapToInt(d -> d.getType().getHp()).sum();
-        int baseDefenseAttack = game.getDefenses().stream().mapToInt(d -> d.getType().getAttack()).sum();
-
-        int baseEnemyHp = wave.getEnemyCount() * wave.getEnemyHp();
-        int baseEnemyAttack = wave.getEnemyCount() * wave.getEnemyAttack();
-
-        int currentDefenseHp = baseDefenseHp;
-        int currentEnemyHp = baseEnemyHp;
-
         StringBuilder log = new StringBuilder();
         log.append("--- INICIO DE OLEADA ").append(wave.getWaveNumber()).append(" ---\n");
-        log.append("Defensas (Poder: ").append(baseDefenseAttack).append(", Vida: ").append(baseDefenseHp).append(")\n");
-        log.append("Enemigos: ").append(wave.getEnemyCount()).append("x ").append(wave.getEnemyName())
-           .append(" (Poder: ").append(baseEnemyAttack).append(", Vida: ").append(baseEnemyHp).append(")\n");
 
-        if (baseDefenseAttack == 0) {
-            log.append("No tienes defensas. Los enemigos avanzan directamente hacia la base.\n");
-            currentDefenseHp = 0;
+        // 1. Fase de Setup: Instanciar unidades
+        List<CombatUnit> defenses = new ArrayList<>();
+        for (DefensePlacement dp : game.getDefenses()) {
+            defenses.add(new CombatUnit(dp.getType().name(), dp.getType().getHp(), dp.getType().getAttack()));
         }
 
+        List<CombatUnit> enemies = new ArrayList<>();
+        for (int i = 0; i < wave.getEnemyCount(); i++) {
+            enemies.add(new CombatUnit(wave.getEnemyName(), wave.getEnemyHp(), wave.getEnemyAttack()));
+        }
+
+        log.append("Fuerzas aliadas: ").append(defenses.size()).append(" unidades.\n");
+        log.append("Fuerzas enemigas: ").append(enemies.size()).append(" ").append(wave.getEnemyName()).append(".\n");
+
+        if (defenses.isEmpty()) {
+            log.append("No tienes defensas. Los enemigos avanzan directamente hacia la base.\n");
+        }
+
+        // 2. Bucle de Combate (por rondas)
         int round = 1;
-        while (currentDefenseHp > 0 && currentEnemyHp > 0) {
-            // Calcular daño actual basado en porcentaje de vida (para que a menos vida, menos peguen)
-            int currentDefenseAttack = (int) Math.ceil(baseDefenseAttack * ((double) currentDefenseHp / baseDefenseHp));
-            
-            // Defensas atacan primero
-            currentEnemyHp -= currentDefenseAttack;
-            log.append("Ronda ").append(round).append(": Defensas hacen ").append(currentDefenseAttack).append(" daño. ");
-            
-            if (currentEnemyHp <= 0) {
-                log.append("Enemigos aniquilados.\n");
-                break;
+        while (!defenses.isEmpty() && !enemies.isEmpty()) {
+            int enemiesKilledThisRound = 0;
+            int defensesKilledThisRound = 0;
+            int enemyDamageTaken = 0;
+            int defenseDamageTaken = 0;
+
+            // Turno Aliado: Defensas atacan a los enemigos (Focus fire frontal)
+            for (CombatUnit defense : defenses) {
+                if (enemies.isEmpty()) break; // No quedan enemigos
+                CombatUnit targetEnemy = enemies.get(0);
+                
+                targetEnemy.hp -= defense.attack;
+                enemyDamageTaken += defense.attack;
+
+                if (targetEnemy.hp <= 0) {
+                    enemies.remove(0);
+                    enemiesKilledThisRound++;
+                }
             }
+
+            // Turno Enemigo: Enemigos vivos atacan a las defensas (Focus fire frontal)
+            for (CombatUnit enemy : enemies) {
+                if (defenses.isEmpty()) break; // No quedan defensas
+                CombatUnit targetDefense = defenses.get(0);
+
+                targetDefense.hp -= enemy.attack;
+                defenseDamageTaken += enemy.attack;
+
+                if (targetDefense.hp <= 0) {
+                    defenses.remove(0);
+                    defensesKilledThisRound++;
+                }
+            }
+
+            // Log de la ronda
+            log.append("> Ronda ").append(round).append(" | ")
+               .append("Aliados infligen ").append(enemyDamageTaken).append(" daño (").append(enemiesKilledThisRound).append(" bajas). ");
             
-            // Enemigos supervivientes atacan
-            int currentEnemyAttack = (int) Math.ceil(baseEnemyAttack * ((double) currentEnemyHp / baseEnemyHp));
-            currentDefenseHp -= currentEnemyAttack;
-            log.append("Enemigos responden con ").append(currentEnemyAttack).append(" daño.\n");
-            
+            if (!enemies.isEmpty()) {
+                log.append("Enemigos infligen ").append(defenseDamageTaken).append(" daño (").append(defensesKilledThisRound).append(" bajas).\n");
+            } else {
+                log.append("\n");
+            }
+
             round++;
         }
 
-        if (currentEnemyHp <= 0) {
-            log.append("¡Tus defensas han defendido la base con éxito!\n");
+        // 3. Resolución final
+        if (enemies.isEmpty()) {
+            log.append("¡Victoria! Tus defensas han aniquilado la oleada.\n");
             int reward = wave.getEnemyCount() * wave.getGoldRewardPerEnemy();
             game.setGold(game.getGold() + reward);
             log.append("Recompensa: +").append(reward).append(" oro.\n");
         } else {
-            // Las defensas murieron, el daño de los enemigos restantes va a la base
-            double survivalRatio = (double) currentEnemyHp / baseEnemyHp;
-            int remainingDamage = (int) Math.ceil(baseEnemyAttack * survivalRatio);
-            
-            game.setBaseHealth(Math.max(0, game.getBaseHealth() - remainingDamage));
-            log.append("¡Tus defensas fueron destruidas! Tu base sufre ").append(remainingDamage).append(" de daño.\n");
+            // Defensas aniquiladas, enemigos sobrantes atacan la base 1 sola vez
+            int remainingEnemyDamage = enemies.stream().mapToInt(e -> e.attack).sum();
+            game.setBaseHealth(Math.max(0, game.getBaseHealth() - remainingEnemyDamage));
+            log.append("¡Tus defensas fueron destruidas! ").append(enemies.size()).append(" enemigos sobrevivientes golpean tu base por ").append(remainingEnemyDamage).append(" de daño.\n");
 
             // Recompensa parcial
-            int killedEnemies = (int)((1.0 - survivalRatio) * wave.getEnemyCount());
+            int killedEnemies = wave.getEnemyCount() - enemies.size();
             int reward = killedEnemies * wave.getGoldRewardPerEnemy();
             game.setGold(game.getGold() + reward);
             log.append("Recompensa parcial: +").append(reward).append(" oro.\n");
         }
-        
+
         return log.toString();
     }
 }
