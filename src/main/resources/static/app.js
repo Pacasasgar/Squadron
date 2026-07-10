@@ -31,6 +31,7 @@ async function createNewGame() {
         gameUi.classList.remove('hidden');
         
         updateHUD(game);
+        fetchNextWaveIntel();
         appendLog(`> Partida #${currentGameId} iniciada. Prepárate para la primera oleada.`);
     } catch (error) {
         console.error("Error creando partida", error);
@@ -249,7 +250,7 @@ function updateHUD(game) {
     elHealth.innerText = game.baseHealth;
     elGold.innerText = game.gold;
     elIncome.innerText = `+${game.income}`;
-    elArcanium.innerText = `${game.arcanium} (+${game.extractionLevel}/rnd)`;
+    elArcanium.innerHTML = `${game.arcanium} <span style="font-size: 0.6em; opacity: 0.8;">(+${game.extractionLevel})</span>`;
     elArmy.innerText = game.armyValue;
     
     // Cambiar color si la vida baja

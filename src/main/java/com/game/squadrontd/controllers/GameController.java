@@ -62,4 +62,14 @@ public class GameController {
     public com.game.squadrontd.models.BattleReplay startWave(@PathVariable Long id) {
         return gameService.startWave(id);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public org.springframework.http.ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public org.springframework.http.ResponseEntity<String> handleIllegalStateException(IllegalStateException e) {
+        return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
+    }
 }

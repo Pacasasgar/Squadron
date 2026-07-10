@@ -47,11 +47,7 @@
                 </div>
                 <div class="hud-stat">
                     <span class="label">ARCANIUM</span>
-                    <span class="value text-arcanium" id="val-arcanium">0 (+0/rnd)</span>
-                </div>
-                <div class="hud-stat">
-                    <span class="label">ARMY VALUE</span>
-                    <span class="value" id="val-army">0</span>
+                    <span class="value text-arcanium" id="val-arcanium">0</span>
                 </div>
             </header>
 
@@ -66,7 +62,7 @@
                             <p>HP: 50 | ATK: 10</p>
                         </div>
                         <button class="btn-buy" onclick="buyDefense('INFANTRY')">
-                            20 <span class="gold-icon">💰</span>
+                            10 <span class="gold-icon">💰</span>
                         </button>
                     </div>
 
@@ -76,7 +72,7 @@
                             <p>HP: 20 | ATK: 25</p>
                         </div>
                         <button class="btn-buy" onclick="buyDefense('ARCHER')">
-                            25 <span class="gold-icon">💰</span>
+                            15 <span class="gold-icon">💰</span>
                         </button>
                     </div>
 
@@ -86,7 +82,7 @@
                             <p>HP: 150 | ATK: 35 | Físico / Pesada</p>
                         </div>
                         <button class="btn-buy" onclick="buyDefense('KNIGHT')">
-                            50 <span class="gold-icon">💰</span>
+                            25 <span class="gold-icon">💰</span>
                         </button>
                     </div>
 
@@ -96,7 +92,7 @@
                             <p>HP: 40 | ATK: 30 | Mágico / Ligera</p>
                         </div>
                         <button class="btn-buy" onclick="buyDefense('MAGE')">
-                            40 <span class="gold-icon">💰</span>
+                            20 <span class="gold-icon">💰</span>
                         </button>
                     </div>
 
@@ -131,7 +127,7 @@
                 <!-- Center Panel: Battlefield Info -->
                 <main class="glass-panel battlefield-panel">
                     <div id="battle-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
-                        <h2 style="border: none; margin: 0; padding: 0;">Aliados</h2>
+                        <h2 style="border: none; margin: 0; padding: 0;">Aliados <span style="font-size: 0.8rem; font-weight: normal; margin-left: 1rem; color: var(--gold);">(Army Value: <span id="val-army">0</span> 💰)</span></h2>
                         <h2 id="enemies-title" class="hidden" style="border: none; margin: 0; padding: 0; color: var(--danger);">Enemigos</h2>
                     </div>
                     

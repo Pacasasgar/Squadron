@@ -24,7 +24,7 @@ public class Game {
     
     // Player State simplified within Game
     private int gold = 100;
-    private int income = 10;
+    private int income = 0;
     private int baseHealth = 100; // Monolith HP
     private int arcanium = 0;
     private int extractionLevel = 0;

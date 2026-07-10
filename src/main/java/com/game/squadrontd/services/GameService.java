@@ -140,11 +140,11 @@ public class GameService {
     public WaveInfo getWaveConfig(int waveNumber) {
         // Configuraciones hardcodeadas para MVP (añadido FlawlessBonus)
         return switch (waveNumber) {
-            case 1 -> new WaveInfo(1, "Duendes", 5, 20, 5, DamageType.PHYSICAL, ArmorType.LIGHT, 2, 10);
-            case 2 -> new WaveInfo(2, "Orcos", 8, 40, 10, DamageType.PHYSICAL, ArmorType.LIGHT, 3, 20);
-            case 3 -> new WaveInfo(3, "Trolls", 3, 100, 30, DamageType.PHYSICAL, ArmorType.HEAVY, 10, 30);
-            case 4 -> new WaveInfo(4, "Espectros", 5, 80, 50, DamageType.MAGIC, ArmorType.LIGHT, 20, 50);
-            default -> new WaveInfo(5, "Dragón Jefe", 1, 1000, 200, DamageType.MAGIC, ArmorType.HEAVY, 100, 150);
+            case 1 -> new WaveInfo(1, "Duendes", 5, 20, 5, DamageType.PHYSICAL, ArmorType.LIGHT, 3, 10);
+            case 2 -> new WaveInfo(2, "Orcos", 8, 40, 10, DamageType.PHYSICAL, ArmorType.LIGHT, 4, 20);
+            case 3 -> new WaveInfo(3, "Trolls", 3, 100, 30, DamageType.PHYSICAL, ArmorType.HEAVY, 15, 30);
+            case 4 -> new WaveInfo(4, "Espectros", 5, 80, 50, DamageType.MAGIC, ArmorType.LIGHT, 25, 40);
+            default -> new WaveInfo(5, "Dragón Jefe", 1, 1000, 200, DamageType.MAGIC, ArmorType.HEAVY, 100, 50);
         };
     }
 }
