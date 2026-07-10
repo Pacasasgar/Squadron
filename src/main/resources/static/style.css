@@ -143,6 +143,7 @@ body {
 
 .text-gold { color: var(--gold); }
 .text-green { color: var(--green); }
+.text-arcanium { color: #c084fc; text-shadow: 0 0 10px rgba(192, 132, 252, 0.5); }
 .text-gradient {
     background: linear-gradient(to right, #60a5fa, #c084fc);
     -webkit-background-clip: text;
@@ -305,6 +306,17 @@ button {
 
 .hp-bar.ally { background: var(--green); }
 .hp-bar.enemy { background: var(--danger); }
+
+.intel-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    font-family: monospace;
+}
+.intel-box span { color: var(--gold); font-weight: bold; }
+.intel-box .reward { color: var(--green); }
 
 .defense-card {
     background: rgba(0, 0, 0, 0.4);

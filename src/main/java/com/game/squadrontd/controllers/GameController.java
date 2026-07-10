@@ -33,6 +33,13 @@ public class GameController {
                 .orElseThrow(() -> new IllegalArgumentException("Partida no encontrada"));
     }
 
+    // GET /api/games/{id}/next-wave -> Devuelve la info de la siguiente oleada
+    @GetMapping("/{id}/next-wave")
+    public com.game.squadrontd.models.WaveInfo getNextWave(@PathVariable Long id) {
+        Game game = getGame(id);
+        return gameService.getWaveConfig(game.getCurrentWave());
+    }
+
     // POST /api/games/{id}/defenses?type=ARCHER -> Compra una defensa
     @PostMapping("/{id}/defenses")
     public Game buyDefense(@PathVariable Long id, @RequestParam DefenseType type) {
@@ -43,6 +50,12 @@ public class GameController {
     @PostMapping("/{id}/economy")
     public Game investEconomy(@PathVariable Long id) {
         return gameService.investEconomy(id);
+    }
+
+    // POST /api/games/{id}/extraction -> Mejora la extraccion del monolito
+    @PostMapping("/{id}/extraction")
+    public Game upgradeExtraction(@PathVariable Long id) {
+        return gameService.upgradeExtraction(id);
     }
 
     @PostMapping("/{id}/start-wave")

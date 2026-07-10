@@ -25,7 +25,9 @@ public class Game {
     // Player State simplified within Game
     private int gold = 100;
     private int income = 10;
-    private int baseHealth = 100;
+    private int baseHealth = 100; // Monolith HP
+    private int arcanium = 0;
+    private int extractionLevel = 0;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DefensePlacement> defenses = new ArrayList<>();
@@ -33,5 +35,10 @@ public class Game {
     public void addDefense(DefensePlacement defense) {
         defenses.add(defense);
         defense.setGame(this);
+    }
+
+    @Transient
+    public int getArmyValue() {
+        return defenses.stream().mapToInt(d -> d.getType().getCost()).sum();
     }
 }

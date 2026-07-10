@@ -13,6 +13,8 @@ const elWave = document.getElementById('val-wave');
 const elHealth = document.getElementById('val-health');
 const elGold = document.getElementById('val-gold');
 const elIncome = document.getElementById('val-income');
+const elArcanium = document.getElementById('val-arcanium');
+const elArmy = document.getElementById('val-army');
 
 // Initialize
 btnNewGame.addEventListener('click', createNewGame);
@@ -58,11 +60,27 @@ async function investEconomy() {
         const response = await fetch(`${API_BASE}/${currentGameId}/economy`, { method: 'POST' });
         if (!response.ok) {
             const text = await response.text();
-            throw new Error(text || "No tienes oro suficiente para mejorar la economía.");
+            throw new Error(text || "No tienes Arcanium suficiente para mejorar la economía.");
         }
         const game = await response.json();
         updateHUD(game);
         appendLog(`> Economía mejorada. Nuevo income: +${game.income}`);
+    } catch (error) {
+        appendLog(`> <span class="damage">[ERROR]</span> ${error.message}`);
+    }
+}
+
+async function upgradeExtraction() {
+    if (!currentGameId) return;
+    try {
+        const response = await fetch(`${API_BASE}/${currentGameId}/extraction`, { method: 'POST' });
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text || "No tienes oro suficiente para mejorar la extracción.");
+        }
+        const game = await response.json();
+        updateHUD(game);
+        appendLog(`> Extractor del Monolito mejorado a nivel ${game.extractionLevel}`);
     } catch (error) {
         appendLog(`> <span class="damage">[ERROR]</span> ${error.message}`);
     }
@@ -75,6 +93,7 @@ async function startWave() {
         document.querySelector('.shop-panel').classList.add('hidden');
         document.getElementById('enemies-title').classList.remove('hidden');
         document.getElementById('enemies-container').classList.remove('hidden');
+        document.getElementById('intel-panel').classList.add('hidden');
 
         const response = await fetch(`${API_BASE}/${currentGameId}/start-wave`, { method: 'POST' });
         if (!response.ok) throw new Error("Error resolviendo la oleada.");
@@ -85,6 +104,7 @@ async function startWave() {
         const formattedLog = replay.textLog
             .replace(/--- INICIO DE OLEADA (.*) ---/g, '<span class="wave">--- INICIO DE OLEADA $1 ---</span>')
             .replace(/Recompensa(.*?)\+/g, '<span class="reward">Recompensa$1+</span>')
+            .replace(/Arcanium/g, '<span class="text-arcanium">Arcanium</span>')
             .replace(/daño/gi, '<span class="damage">daño</span>')
             .replace(/GAME OVER/g, '<span class="damage">GAME OVER</span>')
             .split('\n')
@@ -99,6 +119,7 @@ async function startWave() {
         document.querySelector('.shop-panel').classList.remove('hidden');
         document.getElementById('enemies-title').classList.add('hidden');
         document.getElementById('enemies-container').classList.add('hidden');
+        document.getElementById('intel-panel').classList.remove('hidden');
         
         refreshGameState();
     } catch (error) {
@@ -190,6 +211,29 @@ async function refreshGameState() {
             appendLog(`> <span class="reward">¡HAS GANADO! ¡Sobreviviste a todas las oleadas!</span>`);
             disableUI();
         }
+    } else {
+        fetchNextWaveIntel();
+    }
+}
+
+async function fetchNextWaveIntel() {
+    if (!currentGameId) return;
+    try {
+        const response = await fetch(`${API_BASE}/${currentGameId}/next-wave`);
+        const wave = await response.json();
+        
+        const totalGold = wave.enemyCount * wave.goldRewardPerEnemy;
+        const intelContent = document.getElementById('intel-content');
+        
+        intelContent.innerHTML = `
+            Target: <span>${wave.enemyName}</span> x${wave.enemyCount}<br>
+            Stats: HP ${wave.enemyHp} | ATK ${wave.enemyAttack}<br>
+            Archetype: ${wave.enemyDamageType} / ${wave.enemyArmorType}<br>
+            Base Reward: <span>+${totalGold}</span> 💰<br>
+            <span class="reward">Flawless Bonus: +${wave.flawlessBonus} 💰</span>
+        `;
+    } catch (e) {
+        console.error("Error fetching intel", e);
     }
 }
 
@@ -205,6 +249,8 @@ function updateHUD(game) {
     elHealth.innerText = game.baseHealth;
     elGold.innerText = game.gold;
     elIncome.innerText = `+${game.income}`;
+    elArcanium.innerText = `${game.arcanium} (+${game.extractionLevel}/rnd)`;
+    elArmy.innerText = game.armyValue;
     
     // Cambiar color si la vida baja
     if (game.baseHealth <= 30) {

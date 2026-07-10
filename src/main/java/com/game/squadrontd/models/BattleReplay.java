@@ -12,6 +12,7 @@ public class BattleReplay {
     private String textLog;
     private int remainingBaseHealth;
     private int totalGoldReward;
+    private int earnedArcanium;
     private boolean isGameOver;
     private boolean isVictory;
 

@@ -34,7 +34,7 @@
                     <span class="value text-gradient" id="val-wave">1</span>
                 </div>
                 <div class="hud-stat">
-                    <span class="label">BASE HEALTH</span>
+                    <span class="label">MONOLITH HP</span>
                     <span class="value" id="val-health">100</span>
                 </div>
                 <div class="hud-stat">
@@ -44,6 +44,14 @@
                 <div class="hud-stat">
                     <span class="label">INCOME</span>
                     <span class="value text-green" id="val-income">+10</span>
+                </div>
+                <div class="hud-stat">
+                    <span class="label">ARCANIUM</span>
+                    <span class="value text-arcanium" id="val-arcanium">0 (+0/rnd)</span>
+                </div>
+                <div class="hud-stat">
+                    <span class="label">ARMY VALUE</span>
+                    <span class="value" id="val-army">0</span>
                 </div>
             </header>
 
@@ -93,14 +101,25 @@
                     </div>
 
                     <hr class="divider">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-arcanium); text-align: center;">Mejoras del Monolito</h3>
 
                     <div class="shop-item economy-item">
                         <div class="item-info">
-                            <h3>Invest Economy</h3>
-                            <p>+5 Income per round</p>
+                            <h3>Mejorar Extractor</h3>
+                            <p>+1 Arcanium / ronda</p>
+                        </div>
+                        <button class="btn-buy" onclick="upgradeExtraction()">
+                            50 <span class="gold-icon">💰</span>
+                        </button>
+                    </div>
+
+                    <div class="shop-item economy-item">
+                        <div class="item-info">
+                            <h3>Vender Arcanium</h3>
+                            <p>+1 Income pasivo Oro</p>
                         </div>
                         <button class="btn-buy btn-invest" onclick="investEconomy()">
-                            50 <span class="gold-icon">💰</span>
+                            1 <span class="gold-icon">🔮</span>
                         </button>
                     </div>
 
@@ -117,6 +136,11 @@
                     </div>
                     
                     <div class="battle-arena">
+                        <div id="intel-panel" class="intel-box">
+                            <h3 style="color: var(--text-muted); margin-bottom: 0.5rem;">NEXT WAVE INTEL</h3>
+                            <div id="intel-content">Cargando inteligencia...</div>
+                        </div>
+
                         <div id="defenses-container" class="defenses-grid">
                             <!-- Defenses will be injected here -->
                         </div>
@@ -140,6 +164,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=5"></script>
 </body>
 </html>

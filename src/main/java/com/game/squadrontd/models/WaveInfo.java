@@ -14,4 +14,5 @@ public class WaveInfo {
     private DamageType enemyDamageType;
     private ArmorType enemyArmorType;
     private int goldRewardPerEnemy;
+    private int flawlessBonus;
 }
